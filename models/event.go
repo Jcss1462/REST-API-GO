@@ -106,3 +106,25 @@ func (e Event) Update() error {
 	return err
 
 }
+
+func (e Event) Delete() error {
+
+	query := `
+	DELETE 
+	FROM events 
+	WHERE id=?
+	`
+
+	stmt, err := db.DB.Prepare(query)
+
+	if err != nil {
+		return err
+	}
+
+	//cuando todo el codigo se halla ejecutado cierro la conexion
+	defer stmt.Close()
+
+	_, err = stmt.Exec(e.ID)
+
+	return err
+}
