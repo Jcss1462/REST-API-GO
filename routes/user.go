@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"restapi.com/m/models"
+	"restapi.com/m/utils"
 )
 
 func signUp(context *gin.Context) {
@@ -47,6 +48,13 @@ func logIn(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "Login Exitozo!"})
+	token, err := utils.GenerateToken(user.Email, user.ID)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "No se pudo autenticar usuario", "error": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Login Exitozo!", "token": token})
 
 }
