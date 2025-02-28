@@ -1,6 +1,9 @@
 package models
 
-import "restapi.com/m/db"
+import (
+	"restapi.com/m/db"
+	"restapi.com/m/utils"
+)
 
 type User struct {
 	ID       int64
@@ -24,8 +27,12 @@ func (u User) Save() error {
 	//cuando todo el codigo se halla ejecutado cierro la conexion
 	defer stmt.Close()
 
-	result, err := stmt.Exec(u.Email, u.Password)
+	hashedPassword, err := utils.HashPassword(u.Password)
+	if err != nil {
+		return err
+	}
 
+	result, err := stmt.Exec(u.Email, hashedPassword)
 	if err != nil {
 		return err
 	}
