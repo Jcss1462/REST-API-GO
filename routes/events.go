@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"restapi.com/m/models"
+	"restapi.com/m/utils"
 )
 
 func getEvents(context *gin.Context) {
@@ -38,9 +39,23 @@ func getEvent(context *gin.Context) {
 }
 
 func createEvent(context *gin.Context) {
+
+	token := context.Request.Header.Get("Authorization")
+
+	if token == "" {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "No autorizado"})
+		return
+	}
+
+	err := utils.VerifyToken(token)
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "No autorizado", "error": err.Error()})
+		return
+	}
+
 	var event models.Event
 	//bindea la entradaal tipo de objeto de la estructura
-	err := context.ShouldBindBodyWithJSON(&event)
+	err = context.ShouldBindBodyWithJSON(&event)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "No se pudo convertir la data del body", "error": err.Error()})
