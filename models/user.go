@@ -43,7 +43,7 @@ func (u User) Save() error {
 	return err
 }
 
-func (u User) ValidateCredentials() error {
+func (u *User) ValidateCredentials() error {
 
 	// "?", protege al codigo contra inyecciones sql
 	query := `
