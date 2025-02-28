@@ -4,10 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"restapi.com/m/db"
 	"restapi.com/m/models"
 )
 
 func main() {
+
+	//inicializo la db
+	db.InitDB()
 
 	server := gin.Default()
 
