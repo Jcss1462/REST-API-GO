@@ -15,8 +15,6 @@ type Event struct {
 	UserId      int
 }
 
-var events []Event = []Event{}
-
 func (e Event) Save() error {
 
 	// "?", protege al codigo contra inyecciones sql
@@ -39,8 +37,7 @@ func (e Event) Save() error {
 		return err
 	}
 
-	id, err := result.LastInsertId()
-	e.ID = id
+	_, err = result.LastInsertId()
 	return err
 }
 
@@ -85,4 +82,27 @@ func GetEventByID(id int64) (*Event, error) {
 	}
 
 	return &event, nil
+}
+
+func (e Event) Update() error {
+
+	query := `
+	UPDATE events 
+	SET name =?, description=?,  location=?, dateTime=?
+	WHERE id=?
+	`
+
+	stmt, err := db.DB.Prepare(query)
+
+	if err != nil {
+		return err
+	}
+
+	//cuando todo el codigo se halla ejecutado cierro la conexion
+	defer stmt.Close()
+
+	_, err = stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.ID)
+
+	return err
+
 }

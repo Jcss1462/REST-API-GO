@@ -60,3 +60,38 @@ func createEvent(context *gin.Context) {
 	context.JSON(http.StatusCreated, gin.H{"message": "Evento creado!", "event": event})
 
 }
+
+func updateEvent(context *gin.Context) {
+	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "No se pudo parsear el id del evento", "error": err.Error()})
+		return
+	}
+
+	_, err = models.GetEventByID(eventId)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "No se pudo obtener el evento", "error": err.Error()})
+		return
+	}
+
+	var upadterdEvent models.Event
+	err = context.ShouldBindBodyWithJSON(&upadterdEvent)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "No se pudo convertir la data del body", "error": err.Error()})
+		return
+	}
+
+	upadterdEvent.ID = eventId
+
+	err = upadterdEvent.Update()
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "No se pudo actualizar el evento", "error": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Evento actualizado con exito!"})
+}
