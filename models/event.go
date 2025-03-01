@@ -15,7 +15,7 @@ type Event struct {
 	UserId      int64
 }
 
-func (e Event) Save() error {
+func (e *Event) Save() error {
 
 	// "?", protege al codigo contra inyecciones sql
 	query := `
@@ -37,7 +37,7 @@ func (e Event) Save() error {
 		return err
 	}
 
-	_, err = result.LastInsertId()
+	e.ID, err = result.LastInsertId()
 	return err
 }
 
